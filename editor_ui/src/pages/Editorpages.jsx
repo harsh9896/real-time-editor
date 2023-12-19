@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const Editorpages = () => {
-  return (
-    <div>editor pages</div>
-  )
-}
+  return <div>editor pages</div>;
+};
 
-export default Editorpages
+export default Editorpages;
