@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import "../App.css";
 const Home = () => {
   const [uuid, setuuid] = useState("");
-  const [userName, setUserName] = useState("");
+  const [username, setUserName] = useState("");
   const navigate = useNavigate();
   const generateId = (e) => {
     e.preventDefault();
@@ -16,13 +16,13 @@ const Home = () => {
   };
 
   const joinBtn = () => {
-    if (!uuid || !userName) {
+    if (!uuid || !username) {
       toast.error("Both room Id and User Name is required");
       return;
     }
     navigate(`/editor/${uuid}`, {
       state: {
-        userName,
+        username,
       },
     });
   };
@@ -49,7 +49,7 @@ const Home = () => {
             className="inputBox"
             type="text"
             placeholder="User Name"
-            value={userName}
+            value={username}
             onChange={(e) => setUserName(e.target.value)}
             onKeyUp={enterButtonHandle}
           ></input>
