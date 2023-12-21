@@ -6,6 +6,7 @@ import "codemirror/mode/javascript/javascript";
 import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 
+//React.StrictMode renders the screen two times
 const Editor = () => {
   useEffect(() => {
     async function init() {

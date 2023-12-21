@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Client from "../Components/Client";
 import Editor from "../Components/Editor";
+import { initSocket } from "../socket";
+import ACTIONS from "../Actions";
 
 const Editorpages = () => {
+  const socketRef = useRef(null);
+
+  useEffect(() => {
+    const init = async () => {
+      socketRef.current = await initSocket();
+      //console.log(socketRef.current)
+      //socketRef.current.emit(ACTIONS.JOIN)
+    };
+    init();
+  });
+
   const clients = [
     { username: "Harsh Goyal", socketId: 1 },
     { username: "Sahil Goyal", socketId: 2 },
