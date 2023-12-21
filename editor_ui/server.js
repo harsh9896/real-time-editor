@@ -10,6 +10,7 @@ const userSocketMap = {}
 
 function getAllConnectedClients(roomId)
 {
+    //console.log( Array.from(io.sockets.adapter.rooms.get(roomId)))
     return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
         (socketId) => {
             return {
@@ -22,11 +23,11 @@ function getAllConnectedClients(roomId)
 io.on("connection", (socket) => {
     console.log("socket id", socket.id);
     socket.on(ACTIONS.JOIN, ({roomId, username})=>{
-        console.log(username)
+        //console.log(username)
         userSocketMap[socket.id]= username;
         socket.join(roomId);
         const clients = getAllConnectedClients(roomId);
-        console.log(clients)
+        //console.log(clients)
         clients.forEach(({socketId})=>{
             io.to(socketId).emit(ACTIONS.JOINED, {
                 clients,
@@ -35,10 +36,20 @@ io.on("connection", (socket) => {
             });
         });
     });
+
+    socket.on(ACTIONS.CODE_CHANGE, ({roomId, code})=>{
+        socket.in(roomId).emit(ACTIONS.CODE_CHANGE,{
+            code
+        });
+    });
+
     socket.on("disconnecting", ()=>{
+        //console.log(socket.rooms)
         const rooms = [...socket.rooms]
+        //console.log(rooms.length)
         rooms.forEach((roomId)=>{
-            socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
+            //console.log(roomId)
+            socket.to(roomId).emit(ACTIONS.DISCONNECTED, {
                 socketId: socket.id,
                 username: userSocketMap[socket.id],
             })
