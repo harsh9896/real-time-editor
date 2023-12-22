@@ -21,7 +21,7 @@ function getAllConnectedClients(roomId)
     );
 }
 io.on("connection", (socket) => {
-    console.log("socket id", socket.id);
+    //console.log("socket id", socket.id);
     socket.on(ACTIONS.JOIN, ({roomId, username})=>{
         //console.log(username)
         userSocketMap[socket.id]= username;
@@ -42,6 +42,14 @@ io.on("connection", (socket) => {
             code
         });
     });
+
+    socket.on(ACTIONS.SYNC_CODE, ({socketId, code})=>{
+        //console.log(code);
+        io.to(socketId).emit(ACTIONS.CODE_CHANGE,{
+            code
+        });
+    });
+
 
     socket.on("disconnecting", ()=>{
         //console.log(socket.rooms)
