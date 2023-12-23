@@ -5,10 +5,13 @@ import { initSocket } from "../socket";
 import ACTIONS from "../Actions";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 import toast from "react-hot-toast";
+import Axios from 'axios';
 
 const Editorpages = () => {
   const socketRef = useRef(null);
   const codeRef = useRef(null);
+  const inputRef = useRef("");
+  const outputRef = useRef("");
   const location = useLocation();
   const { roomId } = useParams();
   const reactNavigator = useNavigate();
@@ -69,6 +72,19 @@ const Editorpages = () => {
     }
   }
 
+  function compileCode() {
+    console.log(codeRef.current)
+    Axios.post("http://localhost:5000/compile", {
+      code: codeRef.current,
+      language: 'python',
+      input: inputRef.current.value
+  }).then((output)=>{
+    outputRef.current.value=output.data;
+    console.log(outputRef.current.value);
+  })
+    console.log("Compiling code")
+  }
+
   function leaveRoom() {
     reactNavigator("/");
   }
@@ -102,7 +118,19 @@ const Editorpages = () => {
             codeRef.current = code;
           }}
         />
+        <button className="btn runBtn" onClick={compileCode}>Run</button>
       </div>
+      <div className="inputOutputbox">
+        <div>
+          <h3 style={{color:"white"}}>&nbsp; INPUT</h3>
+          <textarea ref = {inputRef} type="text" className="inputbox"></textarea>
+        </div>
+        <div>
+        <h3 style={{color:"white"}}>&nbsp;OUTPUT</h3>
+        <textarea ref = {outputRef} type="text" className="outputbox"></textarea>
+        </div>
+      </div>
+      
     </div>
   );
 };
