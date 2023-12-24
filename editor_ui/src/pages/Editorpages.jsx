@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import Client from "../Components/Client";
 import Editor from "../Components/Editor";
+import Navbar from "../Components/Navbar";
 import { initSocket } from "../socket";
 import ACTIONS from "../Actions";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 import toast from "react-hot-toast";
-import Axios from 'axios';
+import Axios from "axios";
 
 const Editorpages = () => {
   const socketRef = useRef(null);
@@ -16,6 +17,7 @@ const Editorpages = () => {
   const { roomId } = useParams();
   const reactNavigator = useNavigate();
   const [clients, setClients] = useState([]);
+  const [language, setLanguage] = useState("python");
   useEffect(() => {
     const init = async () => {
       socketRef.current = await initSocket();
@@ -73,16 +75,17 @@ const Editorpages = () => {
   }
 
   function compileCode() {
-    console.log(codeRef.current)
+    //console.log(codeRef.current)
+    console.log(language);
     Axios.post("http://localhost:5000/compile", {
       code: codeRef.current,
-      language: 'python',
-      input: inputRef.current.value
-  }).then((output)=>{
-    outputRef.current.value=output.data;
-    console.log(outputRef.current.value);
-  })
-    console.log("Compiling code")
+      language: language,
+      input: inputRef.current.value,
+    }).then((output) => {
+      outputRef.current.value = output.data;
+      //onsole.log(outputRef.current.value);
+    });
+    console.log("Compiling code");
   }
 
   function leaveRoom() {
@@ -93,44 +96,58 @@ const Editorpages = () => {
     return <Navigate to="/" />;
   }
   return (
-    <div className="mainWrap">
-      <div className="aside">
-        <div className="asideInner">
-          <h3>Connected</h3>
-          <div className="clientsList">
-            {clients.map((client) => (
-              <Client key={client.socketId} username={client.username} />
-            ))}
+    <div className="fullWrap">
+      <div className="nav">
+        <Navbar language={language} setLanguage={setLanguage} />
+      </div>
+      <div className="mainWrap">
+        <div className="aside">
+          <div className="asideInner">
+            <h3>Connected</h3>
+            <div className="clientsList">
+              {clients.map((client) => (
+                <Client key={client.socketId} username={client.username} />
+              ))}
+            </div>
+          </div>
+          <button className="btn copyBtn" onClick={copyRoomId}>
+            Copy ROOM ID
+          </button>
+          <button className="btn leaveBtn" onClick={leaveRoom}>
+            Leave
+          </button>
+        </div>
+        <div className="editorWrap">
+          <Editor
+            socketRef={socketRef}
+            roomId={roomId}
+            onCodeChange={(code) => {
+              codeRef.current = code;
+            }}
+          />
+          <button className="btn runBtn" onClick={compileCode}>
+            Run
+          </button>
+        </div>
+        <div className="inputOutputbox">
+          <div>
+            <h3 style={{ color: "white" }}>&nbsp; INPUT</h3>
+            <textarea
+              ref={inputRef}
+              type="text"
+              className="inputbox"
+            ></textarea>
+          </div>
+          <div>
+            <h3 style={{ color: "white" }}>&nbsp;OUTPUT</h3>
+            <textarea
+              ref={outputRef}
+              type="text"
+              className="outputbox"
+            ></textarea>
           </div>
         </div>
-        <button className="btn copyBtn" onClick={copyRoomId}>
-          Copy ROOM ID
-        </button>
-        <button className="btn leaveBtn" onClick={leaveRoom}>
-          Leave
-        </button>
       </div>
-      <div className="editorWrap">
-        <Editor
-          socketRef={socketRef}
-          roomId={roomId}
-          onCodeChange={(code) => {
-            codeRef.current = code;
-          }}
-        />
-        <button className="btn runBtn" onClick={compileCode}>Run</button>
-      </div>
-      <div className="inputOutputbox">
-        <div>
-          <h3 style={{color:"white"}}>&nbsp; INPUT</h3>
-          <textarea ref = {inputRef} type="text" className="inputbox"></textarea>
-        </div>
-        <div>
-        <h3 style={{color:"white"}}>&nbsp;OUTPUT</h3>
-        <textarea ref = {outputRef} type="text" className="outputbox"></textarea>
-        </div>
-      </div>
-      
     </div>
   );
 };

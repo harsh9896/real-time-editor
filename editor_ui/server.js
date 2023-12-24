@@ -24,7 +24,7 @@ app.post("/compile", (req, res) =>{
     //console.log(input)
     var data = qs.stringify({
         'code': code,
-        'language': 'py',
+        'language': language,
         'input': input
     });
     var config = {
@@ -38,7 +38,7 @@ app.post("/compile", (req, res) =>{
     
     Axios(config)
       .then(function (response) {
-        //console.log(response.data.output);
+        console.log(response.data);
         if(response.data.error!=='')
         res.send(response.data.error);
         else
@@ -62,7 +62,7 @@ function getAllConnectedClients(roomId)
     );
 }
 io.on("connection", (socket) => {
-    //console.log("socket id", socket.id);
+    console.log("socket id", socket.id);
     socket.on(ACTIONS.JOIN, ({roomId, username})=>{
         //console.log(username)
         userSocketMap[socket.id]= username;

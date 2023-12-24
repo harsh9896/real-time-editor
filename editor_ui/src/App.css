@@ -87,18 +87,41 @@ footer a:hover {
 .mainWrap {
   display: grid;
   grid-template-columns: 230px 800px 1fr;
-  
+}
+
+.fullWrap {
+  display: grid;
+  grid-template: 100px;
+}
+
+.nav {
+  min-height: 50px;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  height: 50px;
+  text-align: center;
+  color: #afec3f;
+  background-color: #474747;
+  gap: 20px;
+}
+
+.lang_select {
+  color: #14502b;
 }
 
 .inputOutputbox {
   display: grid;
   grid-template: 42% 48%;
-
 }
 
-.inputbox, .outputbox {
-  min-height: 210px;
-  min-width: 280px; 
+.inputbox,
+.outputbox {
+  min-height: 190px;
+  min-width: 280px;
   font-size: 20px;
   line-height: 1.6;
   padding-top: 10px;
@@ -149,8 +172,8 @@ footer a:hover {
 }
 
 .CodeMirror {
-  min-height: calc(100vh - 100px);
+  min-height: calc(100vh - 120px);
   font-size: 20px;
   line-height: 1.6;
   padding-top: 20px;
-} 
+}
