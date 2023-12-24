@@ -38,7 +38,7 @@ app.post("/compile", (req, res) =>{
     
     Axios(config)
       .then(function (response) {
-        console.log(response.data);
+        //console.log(response.data);
         if(response.data.error!=='')
         res.send(response.data.error);
         else
