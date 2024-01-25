@@ -1,13 +1,14 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
-const ACTIONS = require("./src/Actions");
+const ACTIONS = require("../src/Actions");
 const app = express();
 const cors = require("cors");
 const Axios = require("axios");
 const server = http.createServer(app);
 const io = new Server(server);
 const qs = require("qs");
+require("dotenv").config();
 const mongoose = require("mongoose");
 app.use(cors());
 app.use(express.json());
@@ -21,6 +22,7 @@ app.post("/compile", (req, res) => {
   if (language === "python") {
     language = "python3";
   }
+  console.log(process.env);
   // var data = qs.stringify({
   //     'code': code,
   //     'language': language,
@@ -31,7 +33,7 @@ app.post("/compile", (req, res) => {
     url: "https://online-code-compiler.p.rapidapi.com/v1/",
     headers: {
       "content-type": "application/json",
-      "X-RapidAPI-Key": "fcece7b710mshc9ebdacc58abec4p16e3bdjsn9be22398e036",
+      "X-RapidAPI-Key": `${process.env.REACT_APP_COMPILE_RAPID_API_KEY}`,
       "X-RapidAPI-Host": "online-code-compiler.p.rapidapi.com",
     },
     data: {
