@@ -8,40 +8,41 @@ const Axios = require("axios");
 const server = http.createServer(app);
 const io = new Server(server);
 const qs = require('qs');
+const mongoose = require('mongoose')
 app.use(cors());
 app.use(express.json());
 const userSocketMap = {}
+const URI = "mongodb://127.0.0.1:27017/Editor"
 
 app.post("/compile", (req, res) =>{
-    //console.log(req.body.code)
     let code = req.body.code
     let language = req.body.language;
     let input = req.body.input
-    //console.log(code,input)
     if (language === "python") {
-        language = "py"
+        language = "python3"
     }
-    //console.log(input)
-    var data = qs.stringify({
-        'code': code,
-        'language': language,
-        'input': input
-    });
-    var config = {
-        method: 'post',
-        url: 'https://api.codex.jaagrav.in',
+    // var data = qs.stringify({
+    //     'code': code,
+    //     'language': language,
+    //     'input': input
+    // });
+    const options = {
+        method: 'POST',
+        url: 'https://online-code-compiler.p.rapidapi.com/v1/',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+          'content-type': 'application/json',
+          'X-RapidAPI-Key': 'fcece7b710mshc9ebdacc58abec4p16e3bdjsn9be22398e036',
+          'X-RapidAPI-Host': 'online-code-compiler.p.rapidapi.com'
         },
-        data : data
-    };
-    
-    Axios(config)
+        data: {
+          language: language,
+          version: 'latest',
+          code: code,
+          input: input
+        }
+      };
+    Axios(options)
       .then(function (response) {
-        //console.log(response.data);
-        if(response.data.error!=='')
-        res.send(response.data.error);
-        else
         res.send(response.data.output);
       })
       .catch(function (error) {
@@ -51,7 +52,6 @@ app.post("/compile", (req, res) =>{
 
 function getAllConnectedClients(roomId)
 {
-    //console.log( Array.from(io.sockets.adapter.rooms.get(roomId)))
     return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
         (socketId) => {
             return {
@@ -64,11 +64,9 @@ function getAllConnectedClients(roomId)
 io.on("connection", (socket) => {
     console.log("socket id", socket.id);
     socket.on(ACTIONS.JOIN, ({roomId, username})=>{
-        //console.log(username)
         userSocketMap[socket.id]= username;
         socket.join(roomId);
         const clients = getAllConnectedClients(roomId);
-        //console.log(clients)
         clients.forEach(({socketId})=>{
             io.to(socketId).emit(ACTIONS.JOINED, {
                 clients,
@@ -85,19 +83,21 @@ io.on("connection", (socket) => {
     });
 
     socket.on(ACTIONS.SYNC_CODE, ({socketId, code})=>{
-        //console.log(code);
         io.to(socketId).emit(ACTIONS.CODE_CHANGE,{
             code
         });
     });
 
+    socket.on(ACTIONS.REMOVE, ({roomId,email})=>{
+        socket.to(roomId).emit(ACTIONS.REMOVED,{
+            email,
+        });
+    });
+
 
     socket.on("disconnecting", ()=>{
-        //console.log(socket.rooms)
         const rooms = [...socket.rooms]
-        //console.log(rooms.length)
         rooms.forEach((roomId)=>{
-            //console.log(roomId)
             socket.to(roomId).emit(ACTIONS.DISCONNECTED, {
                 socketId: socket.id,
                 username: userSocketMap[socket.id],
@@ -108,9 +108,88 @@ io.on("connection", (socket) => {
     })
 });
 
+const roomSchema = new mongoose.Schema({
+    roomId:{
+        type: String,
+        required:true,
+        unique:true
+    },
+    owner:{
+        type: String,
+        required: true,
+    },
+    members:{
+        type : Array,
+    }
+})
+
+const room = mongoose.model("room", roomSchema);
+
+mongoose.connect(URI)
+.then((response)=>console.log("Mongodb Connected"))
+.catch((err)=>console.log(err));
 
 
+app.post("/room",async (req,res)=>{
+    try
+    {
+        const result = await room.create({
+        roomId: req.body.roomId,
+        owner: req.body.owner,
+    })
+    }
+    catch(err)
+    {
+        console.log(err)
+    }
+    return res.status(201).json({msg: "success"});
+})
 
+app.get("/room/:id",async (req,res)=>{
+    let result = null
+     try
+     {
+         result = await room.find({roomId:req.params.id});
+     }
+     catch(err)
+     {
+         console.log(err)
+     }
+     return res.status(200).send(result);
+ })
+
+ app.put("/room/add/:id",async (req,res)=>{
+     try
+     {
+         const result = await room.find({roomId: req.params.id})
+         let members = result[0].members
+         if(!members.includes(req.body.member))
+        {
+             members.push(req.body.member)
+            const result2 = await room.updateOne({roomId: req.params.id}, {$set: {members:members}})
+        }
+     }
+     catch(err)
+     {
+         console.log(err)
+     }
+     return res.status(200).json({msg: "updated"});
+ })
+
+ app.put("/room/remove/:id",async (req,res)=>{
+    try
+    {
+        const result = await room.find({roomId: req.params.id})
+        let members = result[0].members
+        members=members.filter((member)=>member!=req.body.member)
+        const result2 = await room.updateOne({roomId: req.params.id}, {$set: {members:members}})
+    }
+    catch(err)
+    {
+        console.log(err)
+    }
+    return res.status(200).json({msg: "updated"});
+})
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server is listening at ${PORT}`));

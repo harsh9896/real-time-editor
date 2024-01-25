@@ -54,6 +54,11 @@ footer {
   transition: all 0.3s ease-in-out;
 }
 
+.btnGrp {
+  display: flex;
+  flex-direction: row;
+}
+
 .joinBtn,
 .leaveBtn {
   background: #4aed88;
@@ -61,8 +66,16 @@ footer {
   margin-left: auto;
 }
 
+.loginBtn {
+  background: #4aed88;
+  width: 100px;
+  margin-right: auto;
+}
+
 .joinBtn:hover,
-.leaveBtn:hover {
+.leaveBtn:hover,
+.loginBtn:hover
+.accessBtn:hover {
   background: #2b824c;
 }
 
@@ -109,8 +122,27 @@ footer a:hover {
   gap: 20px;
 }
 
-.lang_select {
+.select {
   color: #14502b;
+  margin: 5px;
+}
+
+.accessGrp{
+  display: flex;
+  flex-direction: row;
+  margin-left: auto;
+}
+
+.accessBtn{
+  background: #4aed88;
+  width: 100px;
+  height: 50px;
+  font-size: small;
+}
+
+.accessInput{
+  font-size: medium;
+  margin: 5px;
 }
 
 .inputOutputbox {
