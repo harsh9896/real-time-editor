@@ -7,7 +7,7 @@ import ACTIONS from "../Actions";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 import toast from "react-hot-toast";
 import Axios from "axios";
-import {addMember, createRooom, getRoom } from "../api/api";
+import { addMember, createRooom, getRoom } from "../api/api";
 
 const Editorpages = () => {
   const socketRef = useRef(null);
@@ -19,9 +19,9 @@ const Editorpages = () => {
   const reactNavigator = useNavigate();
   const [clients, setClients] = useState([]);
   const [language, setLanguage] = useState("python");
-  const [isOwner, setIsowner] = useState(false)
-  const [accessList, setAccessList] =useState([])
-  const[nav, setnav] = useState(false)
+  const [isOwner, setIsowner] = useState(false);
+  const [accessList, setAccessList] = useState([]);
+  const [nav, setnav] = useState(false);
   useEffect(() => {
     const init = async () => {
       socketRef.current = await initSocket();
@@ -44,30 +44,26 @@ const Editorpages = () => {
           if (username !== location.state?.username) {
             toast.success(`${username} has joined the room`);
           }
-          while(!location.state);
+          while (!location.state);
           getRoom(roomId)
-          .then((response)=>
-          {
-            if(response.data.length)
-            {
-              const owner = response.data[0].owner;
-              if(owner === location.state.email)
-              setIsowner(true);
-              setAccessList(response.data[0].members)
-              setnav(true)
-            }
-            else
-            {
-              createRooom(roomId,location.state?.email)
-              .then((response)=>{
-                setIsowner(true);
-              })
-              .catch((err)=>console.log(err))
-            }
+            .then((response) => {
+              if (response.data.length) {
+                const owner = response.data[0].owner;
+                if (owner === location.state.email) setIsowner(true);
+                setAccessList(response.data[0].members);
+                setnav(true);
+              } else {
+                createRooom(roomId, location.state?.email)
+                  .then((response) => {
+                    setIsowner(true);
+                  })
+                  .catch((err) => console.log(err));
+              }
+            })
+            .catch((err) =>
+              console.log("Error while Getting room details", err)
+            );
 
-          })
-          .catch((err)=>console.log("Error while Getting room details",err))
-         
           setClients(clients);
           socketRef.current.emit(ACTIONS.SYNC_CODE, {
             code: codeRef.current,
@@ -76,19 +72,14 @@ const Editorpages = () => {
         }
       );
 
-      socketRef.current.on(ACTIONS.REMOVED,({email})=>{
-        
-        if(location.state?.email==email)
-        {
-          toast.error("You have been removed by owner")
-          reactNavigator("/")
+      socketRef.current.on(ACTIONS.REMOVED, ({ email }) => {
+        if (location.state?.email == email) {
+          toast.error("You have been removed by owner");
+          reactNavigator("/");
+        } else {
+          toast.error(email + " have been removed by owner");
         }
-        else
-        {
-          toast.error(email + " have been removed by owner")
-        }
-
-      })
+      });
 
       socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
         toast.success(`${username} has left the room`);
@@ -119,11 +110,12 @@ const Editorpages = () => {
       code: codeRef.current,
       language: language,
       input: inputRef.current.value,
-    }).then((output) => {
-      outputRef.current.value = output.data;
-      //onsole.log(outputRef.current.value);
     })
-    .catch((err)=>console.log(err))
+      .then((output) => {
+        outputRef.current.value = output.data;
+        //onsole.log(outputRef.current.value);
+      })
+      .catch((err) => console.log(err));
     console.log("Compiling code");
   }
 
@@ -137,7 +129,18 @@ const Editorpages = () => {
   return (
     <div className="fullWrap">
       <div className="nav">
-        {<Navbar language={language} setLanguage={setLanguage} roomId={roomId} accessList={accessList} setAccessList={setAccessList} isOwner={isOwner} socketRef={socketRef} username={location.state?.username}/>}
+        {
+          <Navbar
+            language={language}
+            setLanguage={setLanguage}
+            roomId={roomId}
+            accessList={accessList}
+            setAccessList={setAccessList}
+            isOwner={isOwner}
+            socketRef={socketRef}
+            username={location.state?.username}
+          />
+        }
       </div>
       <div className="mainWrap">
         <div className="aside">

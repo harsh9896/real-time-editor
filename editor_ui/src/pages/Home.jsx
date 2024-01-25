@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-hot-toast";
-import { useGoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from "@react-oauth/google";
 import "../App.css";
 import axios from "axios";
 import { getRoom } from "../api/api";
@@ -20,23 +20,21 @@ const Home = () => {
   };
 
   const login = useGoogleLogin({
-    onSuccess: async(response) =>{
-      try{
-        const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo",
-        {
-          headers :{
-            Authorization: `Bearer ${response.access_token}`,
-
-        },
+    onSuccess: async (response) => {
+      try {
+        const res = await axios.get(
+          "https://www.googleapis.com/oauth2/v3/userinfo",
+          {
+            headers: {
+              Authorization: `Bearer ${response.access_token}`,
+            },
+          }
+        );
+        setEmail(res.data.email);
+      } catch (err) {
+        console.log(err);
       }
-        )
-        setEmail(res.data.email)
-      }
-      catch(err)
-      {
-        console.log(err)
-      }
-    }
+    },
   });
 
   const joinBtn = () => {
@@ -44,30 +42,30 @@ const Home = () => {
       toast.error("Both room Id and User Name is required");
       return;
     }
-    if(!email)
-    {
+    if (!email) {
       toast.error("First Login with Google email Id");
       return;
     }
     getRoom(uuid)
-    .then((response)=>{
-
-      if(!response.data.length||response.data[0].owner==email||response.data[0].members.includes(email))
-      {
-        navigate(`/editor/${uuid}`, {
-          state: {
-            username,
-            email,
-          },
-        });
-      }
-      else
-      {
-        toast.error("You don't have access to room. Please contact to room owner")
-      }
-    })
-    .catch((err)=>console.log(err))
-    
+      .then((response) => {
+        if (
+          !response.data.length ||
+          response.data[0].owner == email ||
+          response.data[0].members.includes(email)
+        ) {
+          navigate(`/editor/${uuid}`, {
+            state: {
+              username,
+              email,
+            },
+          });
+        } else {
+          toast.error(
+            "You don't have access to room. Please contact to room owner"
+          );
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   const enterButtonHandle = (e) => {
@@ -81,7 +79,9 @@ const Home = () => {
       <div className="formWrapper">
         <h4 className="mainLabel">Paste Invitation ROOM ID</h4>
         <div className="inputGroup">
-          {email&&<h4 style={{marginTop:"5px"}}>You Logged in with {email}</h4>}
+          {email && (
+            <h4 style={{ marginTop: "5px" }}>You Logged in with {email}</h4>
+          )}
           <input
             className="inputBox"
             type="text"
@@ -98,12 +98,12 @@ const Home = () => {
             onKeyUp={enterButtonHandle}
           ></input>
           <div className="btnGrp">
-          <button className="btn loginBtn" onClick={()=>login()}>
-            Login
-          </button>
-          <button className="btn joinBtn" onClick={joinBtn}>
-            Join
-          </button>
+            <button className="btn loginBtn" onClick={() => login()}>
+              Login
+            </button>
+            <button className="btn joinBtn" onClick={joinBtn}>
+              Join
+            </button>
           </div>
           <span className="createInfo">
             {" "}
