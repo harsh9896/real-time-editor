@@ -1,7 +1,7 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
-const ACTIONS = require("../src/Actions");
+const ACTIONS = require("../Actions");
 const app = express();
 const cors = require("cors");
 const Axios = require("axios");
