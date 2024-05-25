@@ -10,7 +10,12 @@ const io = new Server(server);
 const qs = require("qs");
 require("dotenv").config();
 const mongoose = require("mongoose");
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+  origin: ["https://real-time-editor-frontend.vercel.app"],
+  methods: "*",
+  credentials: true
+}));
 app.use(express.json());
 const userSocketMap = {};
 // const URI = "mongodb://127.0.0.1:27017/Editor";
