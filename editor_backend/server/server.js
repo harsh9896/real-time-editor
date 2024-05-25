@@ -13,7 +13,8 @@ const mongoose = require("mongoose");
 app.use(cors());
 app.use(express.json());
 const userSocketMap = {};
-const URI = "mongodb://127.0.0.1:27017/Editor";
+// const URI = "mongodb://127.0.0.1:27017/Editor";
+const URI = `mongodb+srv://harsh:${process.env.DB_CONNECT}@codeeditor.olio7bd.mongodb.net/?retryWrites=true&w=majority&appName=CodeEditor`;
 
 app.post("/compile", (req, res) => {
   let code = req.body.code;
