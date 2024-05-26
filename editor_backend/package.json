@@ -24,11 +24,12 @@
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
     "uuid": "^9.0.1",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "node server.js",
-    "build": "npm install && npm install --prefix editor_ui && npm run build --prefix editor_ui",
+    "build": "npm install --prefix editor_backend && npm install --prefix editor_ui && npm run build --prefix editor_ui",
     "server:dev": "nodemon server.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -52,7 +53,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    
     "nodemon": "^3.0.2"
   }
 }
