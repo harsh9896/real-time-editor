@@ -8,14 +8,15 @@ const Axios = require("axios");
 const server = http.createServer(app);
 const io = new Server(server);
 const qs = require("qs");
+const path = require("path");
 require("dotenv").config();
 const mongoose = require("mongoose");
-// app.use(cors());
-app.use(cors({
-  origin: ["https://real-time-editor-frontend.vercel.app"],
-  methods: "*",
-  credentials: true
-}));
+app.use(cors());
+// app.use(cors({
+//   origin: "*",
+//   methods: "*",
+//   credentials: true
+// }));
 app.use(express.json());
 const userSocketMap = {};
 // const URI = "mongodb://127.0.0.1:27017/Editor";
@@ -189,6 +190,25 @@ app.put("/room/remove/:id", async (req, res) => {
   }
   return res.status(200).json({ msg: "updated" });
 });
+
+
+// --------------------------deployment------------------------------
+
+const __dirname1 = path.resolve();
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "../editor_ui/build")));
+
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname1, "..","editor_ui", "build", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running..");
+  });
+}
+
+// --------------------------deployment------------------------------
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server is listening at ${PORT}`));
