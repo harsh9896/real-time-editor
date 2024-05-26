@@ -106,7 +106,7 @@ const Editorpages = () => {
   }
 
   function compileCode() {
-    Axios.post("http://localhost:5000/compile", {
+    Axios.post("https://real-time-editor-t4dd.onrender.com/compile", {
       code: codeRef.current,
       language: language,
       input: inputRef.current.value,
